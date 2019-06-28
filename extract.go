@@ -31,6 +31,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"runtime"
 )
 
 // Renamer is a function that can be used to rename the files when you're extracting
@@ -103,6 +104,9 @@ func Zip(ctx context.Context, body io.Reader, location string, rename Renamer) e
 type fs struct{}
 
 func (f fs) Link(oldname, newname string) error {
+	if runtime.GOOS == "android" {
+		return os.Symlink(oldname, newname)
+	}
 	return os.Link(oldname, newname)
 }
 
